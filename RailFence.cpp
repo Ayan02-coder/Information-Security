@@ -1,52 +1,86 @@
-// Rail Fence Encryption Code
-
-#include <iostream>
-#include <string>
-#include <vector>
+#include <bits/stdc++.h>
 using namespace std;
 
-string railFenceEncryption(const string& plaintext, int railCount) {
-    vector<string> rails(railCount);
-    int row = 0;
-    bool down = true;
+string encryptRailFence(string text, int key) {
+    char rail[key][text.length()];
 
-    for (char c : plaintext) {
-        rails[row] += c;
+    for (int i = 0; i < key; i++)
+        for (int j = 0; j < text.length(); j++)
+            rail[i][j] = '\n';
 
-        if (row == 0) {
-            down = true;
-        } else if (row == railCount - 1) {
-            down = false;
-        }
+    bool dir_down = false;
+    int row = 0, col = 0;
 
-        if (down) {
-            row++;
-        } else {
-            row--;
-        }
+    for (int i = 0; i < text.length(); i++) {
+        if (row == 0 || row == key - 1)
+            dir_down = !dir_down;
+        rail[row][col++] = text[i];
+        dir_down ? row++ : row--;
     }
 
-    string ciphertext;
-    for (const string& rail : rails) {
-        ciphertext += rail;
+    string result;
+    for (int i = 0; i < key; i++)
+        for (int j = 0; j < text.length(); j++)
+            if (rail[i][j] != '\n')
+                result.push_back(rail[i][j]);
+
+    return result;
+}
+
+string decryptRailFence(string cipher, int key) {
+    char rail[key][cipher.length()];
+
+    for (int i = 0; i < key; i++)
+        for (int j = 0; j < cipher.length(); j++)
+            rail[i][j] = '\n';
+
+    bool dir_down;
+
+    int row = 0, col = 0;
+
+    for (int i = 0; i < cipher.length(); i++) {
+        if (row == 0)
+            dir_down = true;
+        if (row == key - 1)
+            dir_down = false;
+        rail[row][col++] = '*';
+        dir_down ? row++ : row--;
     }
 
-    return ciphertext;
+    int index = 0;
+    for (int i = 0; i < key; i++)
+        for (int j = 0; j < cipher.length(); j++)
+            if (rail[i][j] == '*' && index < cipher.length())
+                rail[i][j] = cipher[index++];
+
+    string result;
+    row = 0, col = 0;
+    for (int i = 0; i < cipher.length(); i++) {
+        if (row == 0)
+            dir_down = true;
+        if (row == key - 1)
+            dir_down = false;
+        if (rail[row][col] != '*')
+            result.push_back(rail[row][col++]);
+        dir_down ? row++ : row--;
+    }
+    return result;
 }
 
 int main() {
-    string plaintext, ciphertext;
-    int railCount;
-
-    cout << "Enter plaintext: ";
-    getline(cin, plaintext);
-
-    cout << "Enter the number of rails: ";
-    cin >> railCount;
-
-    ciphertext = railFenceEncryption(plaintext, railCount);
-
-    cout << "Encrypted message: " << ciphertext << endl;
+    string a,c;
+    int b;
+    cout << "Enter Plain Text: ";
+    cin >> a;
+    cout << "Enter shift value: ";
+    cin >> b;
+    c=encryptRailFence(a, b);
+    cout<<"Encryption"<<endl;
+    cout << c << endl;
+    
+    cout<<"decryption"<<endl;
+    cout << decryptRailFence(c, b) << endl;
+    
 
     return 0;
 }
@@ -56,12 +90,12 @@ int main() {
 
 
 
-
-
-
-                                       //OutPut
-        /* Enter plaintext: Ayansayyad
-           Enter the number of rails: 3
-           Encrypted message:  */
-
-                            
+//output
+/*
+Enter Plain Text: ayan
+Enter shift value: 3
+Encryption
+ayna
+decryption
+ayan  
+*/
